@@ -1,0 +1,81 @@
+from datetime import date
+import calendar
+
+def calculate_age(dob, today):
+    years = today.year - dob.year
+
+    birthday_day = min(
+        dob.day,
+        calendar.monthrange(today.year, dob.month)[1]
+    )
+    birthday = date(today.year, dob.month, birthday_day)
+
+    if today < birthday:
+        years -= 1
+
+    last_birthday_year = dob.year + years
+    last_birthday_day = min(
+        dob.day,
+        calendar.monthrange(last_birthday_year, dob.month)[1]
+    )
+
+    last_birthday = date(
+        last_birthday_year, dob.month, last_birthday_day
+    )
+
+    months = 0
+
+    while months < 11:
+        month_index = last_birthday.month - 1 + months + 1
+        year = last_birthday.year + month_index // 12
+        month = month_index % 12 + 1
+
+        day = min(dob.day, calendar.monthrange(year, month)[1])
+        next_month = date(year, month, day)
+
+        if next_month > today:
+            break
+
+        months += 1
+
+    month_index = last_birthday.month - 1 + months
+    year = last_birthday.year + month_index // 12
+    month = month_index % 12 + 1
+    day = min(dob.day, calendar.monthrange(year, month)[1])
+
+    last_month = date(year, month, day)
+    days = (today - last_month).days
+
+    return years, months, days
+
+
+def main():
+    print("========== AGE CALCULATOR ==========")
+
+    try:
+        dob_input = input("Enter date of birth (DD-MM-YYYY): ")
+        dob = date(
+            int(dob_input[6:10]),
+            int(dob_input[3:5]),
+            int(dob_input[0:2])
+        )
+
+        today = date.today()
+
+        if dob > today:
+            print("Error: Date of birth cannot be in the future.")
+            return
+
+        years, months, days = calculate_age(dob, today)
+
+        print("\nYour Exact Age:")
+        print("Years :", years)
+        print("Months:", months)
+        print("Days  :", days)
+
+    except ValueError:
+        print("Invalid date! Please enter a valid date in DD-MM-YYYY format.")
+
+
+if __name__ == "__main__":
+    main()
